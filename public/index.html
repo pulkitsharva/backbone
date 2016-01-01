@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <title>hackerrank test</title>
+      <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.2/jquery.min.js" type="text/javascript"></script>
+      <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.1.1/css/bootstrap.min.css">
+      <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.2/underscore-min.js" type="text/javascript"></script>
+      <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js"></script>
+   </head>
+   <body>
+      <div class="container">
+         <h1>Candidate Management</h1>
+         <hr />
+         <div class="page"></div>
+      </div>
+      <script type="text/template" id="candidate-list-template">
+         <a href="#/new" class="btn btn-primary">New</a>
+         <hr />
+         <table class="table striped">
+           <thead>
+             <tr>
+               <th>Id</th><th>Name</th><th>Recruiter</th><th></th>
+             </tr>
+           </thead>
+           <tbody>
+             <% _.each(candidates, function(candidate) { %>
+               <tr>
+                 <td><%= htmlEncode(candidate.get('id')) %></td>
+                 <td><%= htmlEncode(candidate.get('name')) %></td>
+                 <td><%= htmlEncode(candidate.get('recruiter_id')) %></td>
+                 <td><a class="btn" href="#/edit/<%= candidate.id %>">Edit</a></td>
+               </tr>
+             <% }); %>
+           </tbody>
+         </table>
+      </script>
+      <script type="text/template" id="edit-candidate-template">
+         <form class="edit-candidate-form">
+           <legend><%= candidate ? 'Edit' : 'New' %> Candidate</legend>
+           <% if(candidate) { %>
+             <label>Id</label>
+             <input name="id" type="text" value="<%= candidate.id %>" disabled=disabled>
+           <% }; %>
+             <label>Name</label>
+             <input name="name" type="text"  value="<%= candidate ? candidate.get('name') : '' %>">
+             <label>Recruiter</label>
+             <input name="recruiter_id" type="text" value="<%= candidate ? candidate.get('recruiter_id') : '' %>">
+             <hr />
+            <button type="submit" class="btn"><%= candidate ? 'Update' : 'Create' %></button>
+            <% if(candidate) { %>
+              <button data-user-id="<%= candidate.id %>" class="btn btn-danger delete">Delete</button>
+            <% }; %>
+         </form>
+      </script>
+      <script type="text/javascript">
+         function htmlEncode(value){
+           return $('<div/>').text(value).html();
+         }
+      </script>
+      <script>
+         $.fn.serializeObject = function() {
+             var o = {};
+             var a = this.serializeArray();
+             $.each(a, function() {
+                 if (o[this.name] !== undefined) {
+                     if (!o[this.name].push) {
+                         o[this.name] = [o[this.name]];
+                     }
+                     o[this.name].push(this.value || '');
+                 } else {
+                     o[this.name] = this.value || '';
+                 }
+             });
+             return o;
+           };
+          $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+           options.url = 'http://localhost:4567/api' + options.url;
+         });
+         
+         
+         var Candidates=Backbone.Collection.extend({
+           url:'/candidate'
+         });
+         var Candidate = Backbone.Model.extend({
+             urlRoot: '/candidate'
+         });
+          
+         var CandidateList=Backbone.View.extend({
+           el: '.page',
+           render: function(){
+             var that=this;
+             var candidates=new Candidates();
+             candidates.fetch({
+               success: function(candidates){
+                 var template = _.template($('#candidate-list-template').html(), {candidates: candidates.models});
+                 that.$el.html(template);    
+               }
+             })
+           }
+         });
+         
+         var CandidateEditView = Backbone.View.extend({
+           el: '.page',
+           render: function(options){
+             var that = this;
+             if(options){
+               that.candidate = new Candidate({id: options.id});
+                 that.candidate.fetch({
+                   success: function (candidate) {    
+                     var template = _.template($('#edit-candidate-template').html(), {candidate: candidate});
+                     that.$el.html(template);
+                   }
+                 })
+             }
+             else{
+               var template = _.template($('#edit-candidate-template').html(), {candidate: null});
+               this.$el.html(template);   
+             }
+             
+           },
+           events: {
+             'submit .edit-candidate-form': 'saveCandidate'
+           },
+           saveCandidate: function (ev) {
+             var candidateDetails = $(ev.currentTarget).serializeObject();
+             var candidate = new Candidate();
+             candidate.save(candidateDetails, {
+               type: "POST",
+               contentType: "application/json",
+               success: function (candidate) {
+                 router.navigate('', {trigger:true});
+               }
+             });
+             return false;
+           }
+         });
+         var candidateList=new CandidateList();
+         var candidateEditView=new CandidateEditView();
+         
+         var Router = Backbone.Router.extend({
+               routes: {
+                 '': 'home',
+                 'new': 'new',
+                 'edit/:id':'edit'
+               }
+           });
+         
+         var router = new Router;
+           router.on('route:home', function() {  
+             candidateList.render();
+             
+           })
+           router.on('route:new', function() {
+             candidateEditView.render();
+             
+           })
+           router.on('route:edit', function(id) {
+             candidateEditView.render({id: id});
+           })
+         
+           Backbone.history.start();
+      </script>
+   </body>
+</html>
