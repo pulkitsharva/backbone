@@ -39,14 +39,3 @@ post '/api/candidate' do
   format_response(candidate, request.accept)
 end
 
-put '/api/candidate' do
-  body = JSON.parse request.body.read
-  recruiter=Recruiter.get(body['recruiter_id'])
-  candidate = Candidate.create(
-    name:    body['name'],
-    recruiter: recruiter
-  )
-  status 201
-  format_response(candidate, request.accept)
-end
-

@@ -15,12 +15,12 @@
       <script type="text/template" id="candidate-list-template">
          <h1>Candidate Management</h1>
          <hr />
-         <a href="#/new" class="btn btn-primary">New</a>
+         <a href="#/candidate/new" class="btn btn-primary">New</a>
          <hr />
          <table class="table striped">
            <thead>
              <tr>
-               <th>Id</th><th>Name</th><th>Recruiter</th><th></th>
+               <th>Id</th><th>Name</th><th>Recruiter</th>
              </tr>
            </thead>
            <tbody>
@@ -29,7 +29,7 @@
                  <td><%= htmlEncode(candidate.get('id')) %></td>
                  <td><%= htmlEncode(candidate.get('name')) %></td>
                  <td><%= htmlEncode(candidate.get('recruiter_id')) %></td>
-                 <td><a class="btn" href="#/edit/<%= candidate.id %>">Edit</a></td>
+                 <td><a class="btn" href="#/candidate/edit/<%= candidate.id %>">Edit</a></td>
                </tr>
              <% }); %>
            </tbody>
@@ -62,6 +62,50 @@
           <hr />
           <a class="btn" href="#/candidate">Candidate</a>
           <a class="btn" href="#/recruiter">Recruiter</a>
+      </script>
+      <script type="text/template" id="recruiter-list-template">
+         <h1>Recruiter Management</h1>
+         <hr />
+         <a href="#/recruiter/new" class="btn btn-primary">New</a>
+         <hr />
+         <table class="table striped">
+           <thead>
+             <tr>
+               <th>Id</th><th>Name</th><th>Location</th>
+             </tr>
+           </thead>
+           <tbody>
+             <% _.each(recruiters, function(recruiter) { %>
+               <tr>
+                 <td><%= htmlEncode(recruiter.get('id')) %></td>
+                 <td><%= htmlEncode(recruiter.get('name')) %></td>
+                 <td><%= htmlEncode(recruiter.get('location')) %></td>
+                 <td><a class="btn" href="#/recruiter/edit/<%= recruiter.id %>">Edit</a></td>
+               </tr>
+             <% }); %>
+           </tbody>
+         </table>
+      </script>
+      <script type="text/template" id="edit-recruiter-template">
+         <h1>Recruiter Management</h1>
+         <hr />
+         <form class="edit-recruiter-form">
+           <legend><%= recruiter ? 'Edit' : 'New' %> Recruiter</legend>
+           <% if(recruiter) { %>
+             <label>Id</label>
+             <input name="id" type="text" value="<%= recruiter.id %>" disabled=disabled>
+           <% }; %>
+             <label>Name</label>
+             <input name="name" type="text"  value="<%= recruiter ? recruiter.get('name') : '' %>">
+             <label>Location</label>
+             <input name="location" type="text" value="<%= recruiter ? recruiter.get('location') : '' %>">
+             <hr />
+            <button type="submit" class="btn"><%= recruiter ? 'Update' : 'Create' %></button>
+            <% if(recruiter) { %>
+               <input type="hidden" name="id" value="<%= recruiter.id %>" />
+              <button data-user-id="<%= recruiter.id %>" class="btn btn-danger delete">Delete</button>
+            <% }; %>
+         </form>
       </script>
       <script src="application.js" type="text/javascript"></script>
    </body>

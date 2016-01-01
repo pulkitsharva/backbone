@@ -28,6 +28,12 @@ var Candidates = Backbone.Collection.extend({
 var Candidate = Backbone.Model.extend({
     urlRoot: '/candidate'
 });
+var Recruiters = Backbone.Collection.extend({
+    url: '/recruiter'
+});
+var Recruiter = Backbone.Model.extend({
+    urlRoot: '/recruiter'
+});
 
 var Homepage = Backbone.View.extend({
     el: '.page',
@@ -37,19 +43,36 @@ var Homepage = Backbone.View.extend({
         this.$el.html(template);
     }
 });
-  var CandidateList=Backbone.View.extend({
-           el: '.page',
-           render: function(){
-             var that=this;
-             var candidates=new Candidates();
-             candidates.fetch({
-               success: function(candidates){
-                 var template = _.template($('#candidate-list-template').html(), {candidates: candidates.models});
-                 that.$el.html(template);    
-               }
-             })
-           }
-         });
+var CandidateList = Backbone.View.extend({
+    el: '.page',
+    render: function() {
+        var that = this;
+        var candidates = new Candidates();
+        candidates.fetch({
+            success: function(candidates) {
+                var template = _.template($('#candidate-list-template').html(), {
+                    candidates: candidates.models
+                });
+                that.$el.html(template);
+            }
+        })
+    }
+});
+var RecruiterList = Backbone.View.extend({
+    el: '.page',
+    render: function() {
+        var that = this;
+        var recruiters = new Recruiters();
+        recruiters.fetch({
+            success: function(recruiters) {
+                var template = _.template($('#recruiter-list-template').html(), {
+                    recruiters: recruiters.models
+                });
+                that.$el.html(template);
+            }
+        })
+    }
+});
 var CandidateEditView = Backbone.View.extend({
     el: '.page',
     render: function(options) {
@@ -72,7 +95,6 @@ var CandidateEditView = Backbone.View.extend({
             });
             this.$el.html(template);
         }
-
     },
     events: {
         'submit .edit-candidate-form': 'saveCandidate'
@@ -91,16 +113,62 @@ var CandidateEditView = Backbone.View.extend({
         return false;
     }
 });
+var RecruiterEditView = Backbone.View.extend({
+    el: '.page',
+    render: function(options) {
+        var that = this;
+        if (options) {
+            that.recruiter = new Recruiter({
+                id: options.id
+            });
+            that.recruiter.fetch({
+                success: function(recruiter) {
+                    var template = _.template($('#edit-recruiter-template').html(), {
+                        recruiter: recruiter
+                    });
+                    that.$el.html(template);
+                }
+            })
+        } else {
+            var template = _.template($('#edit-recruiter-template').html(), {
+                recruiter: null
+            });
+            this.$el.html(template);
+        }
+    },
+    events: {
+        'submit .edit-recruiter-form': 'saveRecruiter'
+    },
+    saveRecruiter: function(ev) {
+        var recruiterDetails = $(ev.currentTarget).serializeObject();
+        var recruiter = new Recruiter();
+        recruiter.save(recruiterDetails, {
+            contentType: "application/json",
+            success: function(recruiter) {
+                router.navigate('recruiter', {
+                    trigger: true
+                });
+            }
+        });
+        return false;
+    }
+});
 var homepage = new Homepage();
 var candidateList = new CandidateList();
 var candidateEditView = new CandidateEditView();
+var recruiterList = new RecruiterList();
+var recruiterEditView = new RecruiterEditView();
 
 var Router = Backbone.Router.extend({
     routes: {
         '': 'home',
-        'candidate':'candidate',
-        'new': 'new',
-        'edit/:id': 'edit'
+        'candidate': 'candidate',
+        'candidate/new': 'candidate_new',
+        'candidate/edit/:id': 'candidate_edit',
+        'recruiter': 'recruiter',
+        'recruiter/new': 'recruiter_new',
+        'recruiter/edit/:id': 'recruiter_edit'
+
     }
 });
 
@@ -113,14 +181,25 @@ router.on('route:candidate', function() {
     candidateList.render();
 
 })
-router.on('route:new', function() {
+router.on('route:candidate_new', function() {
     candidateEditView.render();
 
 })
-router.on('route:edit', function(id) {
+router.on('route:candidate_edit', function(id) {
     candidateEditView.render({
         id: id
     });
+})
+router.on('route:recruiter', function() {
+    recruiterList.render();
+
+})
+router.on('route:recruiter_new', function() {
+    recruiterEditView.render();
+
+})
+router.on('route:recruiter_edit', function(id) {
+    recruiterEditView.render({id: id});
 })
 
 Backbone.history.start();
