@@ -69,7 +69,33 @@ var CandidateList = Backbone.View.extend({
 });
 var CandidateEditView = Backbone.View.extend({
     el: '.page',
-    render: function(options) {
+    events: {
+        'submit .edit-candidate-form': 'saveCandidate',
+         'click .delete': 'deleteCandidate'
+    },
+    saveCandidate: function(ev) {
+        var candidateDetails = $(ev.currentTarget).serializeObject();
+        var candidate = new Candidate();
+        candidate.save(candidateDetails, {
+            contentType: "application/json",
+            success: function(candidate) {
+                router.navigate('candidate', {
+                    trigger: true
+                });
+            }
+        });
+        return false;
+    },
+    deleteCandidate: function (ev) {
+        this.candidate.destroy({
+          success: function () {
+            console.log('destroyed');
+            router.navigate('candidate', {trigger:true});
+          }
+        });
+        return false;
+      },
+      render: function(options) {
         var that = this;
         if (options) {
             that.candidate = new Candidate({
@@ -89,22 +115,6 @@ var CandidateEditView = Backbone.View.extend({
             });
             this.$el.html(template);
         }
-    },
-    events: {
-        'submit .edit-candidate-form': 'saveCandidate'
-    },
-    saveCandidate: function(ev) {
-        var candidateDetails = $(ev.currentTarget).serializeObject();
-        var candidate = new Candidate();
-        candidate.save(candidateDetails, {
-            contentType: "application/json",
-            success: function(candidate) {
-                router.navigate('candidate', {
-                    trigger: true
-                });
-            }
-        });
-        return false;
     }
 });
 var RecruiterList = Backbone.View.extend({
@@ -124,7 +134,33 @@ var RecruiterList = Backbone.View.extend({
 });
 var RecruiterEditView = Backbone.View.extend({
     el: '.page',
-    render: function(options) {
+    events: {
+        'submit .edit-recruiter-form': 'saveRecruiter',
+        'click .delete': 'deleteRecruiter'
+    },
+    saveRecruiter: function(ev) {
+        var recruiterDetails = $(ev.currentTarget).serializeObject();
+        var recruiter = new Recruiter();
+        recruiter.save(recruiterDetails, {
+            contentType: "application/json",
+            success: function(recruiter) {
+                router.navigate('recruiter', {
+                    trigger: true
+                });
+            }
+        });
+        return false;
+    },
+    deleteRecruiter: function (ev) {
+        this.recruiter.destroy({
+          success: function () {
+            console.log('destroyed');
+            router.navigate('recruiter', {trigger:true});
+          }
+        });
+        return false;
+      },
+      render: function(options) {
         var that = this;
         if (options) {
             that.recruiter = new Recruiter({
@@ -144,22 +180,6 @@ var RecruiterEditView = Backbone.View.extend({
             });
             this.$el.html(template);
         }
-    },
-    events: {
-        'submit .edit-recruiter-form': 'saveRecruiter'
-    },
-    saveRecruiter: function(ev) {
-        var recruiterDetails = $(ev.currentTarget).serializeObject();
-        var recruiter = new Recruiter();
-        recruiter.save(recruiterDetails, {
-            contentType: "application/json",
-            success: function(recruiter) {
-                router.navigate('recruiter', {
-                    trigger: true
-                });
-            }
-        });
-        return false;
     }
 });
 var RecruiterCandidateList = Backbone.View.extend({

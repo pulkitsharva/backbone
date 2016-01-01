@@ -9,6 +9,13 @@ get '/api/recruiter/:id' do
   format_response(recruiter, request.accept)
 end
 
+delete '/api/recruiter/:id' do
+  recruiter ||= Recruiter.get(params[:id]) || halt(404)
+  candidate ||= Candidate.all(Candidate.recruiter.id => params[:id]) || halt(404)
+  logger.info candidate.destroy
+  logger.info recruiter.destroy
+end
+
 post '/api/recruiter' do
   
   body = JSON.parse request.body.read

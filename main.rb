@@ -4,6 +4,29 @@ require 'sinatra'
 require 'data_mapper'
 require 'dm-migrations'
 require 'sinatra/cross_origin'
+require 'logger'
+class MyApp < Sinatra::Application
+  configure :development do
+    set :haml, { :ugly=>true }
+    set :clean_trace, true
+
+    Dir.mkdir('logs') unless File.exist?('logs')
+
+    $logger = Logger.new('logs/common.log','weekly')
+    $logger.level = Logger::WARN
+
+    # Spit stdout and stderr to a file during production
+    # in case something goes wrong
+    $stdout.reopen("logs/output.log", "w")
+    $stdout.sync = true
+    $stderr.reopen($stdout)
+  end
+
+  configure :development do
+    $logger = Logger.new(STDOUT)
+  end
+end
+
 
 configure :development do
   enable :cross_origin

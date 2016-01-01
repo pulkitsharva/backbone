@@ -8,6 +8,11 @@ get '/api/candidate/:id' do
   format_response(candidate, request.accept)
 end
 
+delete '/api/candidate/:id' do
+  candidate ||= Candidate.get(params[:id]) || halt(404)
+  candidate.destroy
+end
+
 get '/api/candidate' do
   format_response(Candidate.all, request.accept)
 end

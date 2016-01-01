@@ -4,5 +4,5 @@ class Candidate
 
   property :id,         Serial, :key => true
   property :name,      String
-  belongs_to :recruiter
+  belongs_to :recruiter, :model => 'Recruiter'
 end
