@@ -5,7 +5,6 @@ require 'data_mapper'
 require 'dm-migrations'
 require 'sinatra/cross_origin'
 require 'logger'
-class MyApp < Sinatra::Application
   configure :development do
     set :haml, { :ugly=>true }
     set :clean_trace, true
@@ -25,7 +24,6 @@ class MyApp < Sinatra::Application
   configure :development do
     $logger = Logger.new(STDOUT)
   end
-end
 
 configure :production do
   enable :cross_origin
