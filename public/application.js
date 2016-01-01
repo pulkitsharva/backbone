@@ -18,7 +18,7 @@ $.fn.serializeObject = function() {
     return o;
 };
 $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
-    options.url = 'http://http://hackerrank-pulkits.rhcloud.com/api' + options.url;
+    options.url = 'http://localhost:4567/api' + options.url;
 });
 
 
