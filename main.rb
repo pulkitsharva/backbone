@@ -27,6 +27,14 @@ class MyApp < Sinatra::Application
   end
 end
 
+configure :production do
+  enable :cross_origin
+  DataMapper::Logger.new($stdout, :debug)
+  DataMapper.setup(
+    :default,
+    'mysql://adminFwVa6Lt:BbSvdxG___Lc@$OPENSHIFT_MYSQL_DB_HOST:$OPENSHIFT_MYSQL_DB_PORT/hackerrank'
+  )
+end
 
 configure :development do
   enable :cross_origin
